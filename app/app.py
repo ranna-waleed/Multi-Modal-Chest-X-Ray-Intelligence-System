@@ -1,6 +1,5 @@
 """
 CXR Intelligence System — Gradio Demo Application
-===================================================
 Dual-mode multi-modal chest X-ray AI system.
 
 Run:
@@ -34,7 +33,7 @@ qa_pipeline: QAPipeline = None
 retriever: RAGRetriever = None
 
 
-# Image Helper
+#  Image Helper 
 
 def to_pil(image) -> Image.Image:
     """
@@ -60,7 +59,7 @@ def to_pil(image) -> Image.Image:
         return None
 
 
-#  Model Initialization
+# Model Initialization 
 
 def initialize_models(demo_mode: bool = True, hf_token: str = ""):
     global report_pipeline, qa_pipeline, retriever
@@ -91,7 +90,7 @@ def initialize_models(demo_mode: bool = True, hf_token: str = ""):
         try:
             from src.models.colpali import ColPaliModel
             colpali_model = ColPaliModel(hf_token=token).load()
-            logger.info(" ColPali loaded")
+            logger.info("ColPali loaded")
         except Exception as e:
             logger.error(f" ColPali failed: {e}")
 
@@ -113,8 +112,8 @@ def initialize_models(demo_mode: bool = True, hf_token: str = ""):
     )
 
     status = "\n".join([
-        f"MedGemma: {'Loaded' if medgemma_model else ' Demo mode'}",
-        f"CLIP:     {' Loaded' if clip_model else 'Demo mode'}",
+        f"MedGemma: {' Loaded' if medgemma_model else ' Demo mode'}",
+        f"CLIP:     {' Loaded' if clip_model else ' Demo mode'}",
         f"ColPali:  {' Loaded' if colpali_model else ' Demo mode'}",
         f"RAG KB:    {len(retriever._knowledge_base)} reports indexed",
     ])
@@ -180,7 +179,7 @@ def answer_question(image, question, use_retrieval, top_k):
 
 def get_model_info():
     return """
-## Models Used
+##  Models Used
 
 ### 1. MedGemma — Primary Model (Mandatory)
 - **ID**: `google/medgemma-4b-it`
@@ -212,9 +211,9 @@ def get_model_info():
 | Aspect | MedGemma | CLIP | ColPali |
 |--------|----------|------|---------|
 | Output | Full narrative | Template labels | Retrieval scores |
-| Medical fine-tune |  Yes |  General |  Yes |
+| Medical fine-tune |  Yes |  General | Yes |
 | Report generation |  Full |  Template |  No |
-| QA support |  Yes |  No |  No |
+| QA support | Yes |  No | No |
 | RAG retrieval |  No |  Single-vector |  Multi-vector |
 | GPU required |  ~8 GB |  Optional |  ~6 GB |
 | Speed | Slow | Fast | Medium |
@@ -277,7 +276,7 @@ def build_ui():
             gr.HTML("""
             <div style="background:#fef3c7; border:1px solid #f59e0b; padding:10px 16px;
                         border-radius:8px; margin:0 0 12px 0; font-size:0.9em">
-                  <strong>Demo Mode</strong> — Models not loaded.
+                ⚠️ <strong>Demo Mode</strong> — Models not loaded.
                 Outputs are placeholder examples showing system structure.
                 To enable real inference: set <code>HF_TOKEN</code> and run on a GPU machine.
             </div>
@@ -286,7 +285,7 @@ def build_ui():
         with gr.Tabs():
 
             #  Tab 1: Report Generation 
-            with gr.Tab("Report Generation"):
+            with gr.Tab("📄 Report Generation"):
                 gr.Markdown(
                     "Upload a chest X-ray → get a structured radiology report "
                     "from **MedGemma** compared with **CLIP**."
@@ -355,7 +354,7 @@ def build_ui():
 
                         gr.Markdown("**Quick Questions:**")
                         with gr.Row():
-                            q1 = gr.Button(" Pneumonia?",    size="sm")
+                            q1 = gr.Button("Pneumonia?",    size="sm")
                             q2 = gr.Button(" Effusion?",     size="sm")
                         with gr.Row():
                             q3 = gr.Button(" Cardiomegaly?", size="sm")
@@ -396,42 +395,6 @@ def build_ui():
             with gr.Tab(" Models & Architecture"):
                 gr.Markdown(get_model_info())
 
-            #  Tab 4: Settings 
-            with gr.Tab(" Settings"):
-                with gr.Row():
-                    with gr.Column():
-                        gr.Markdown("### Load Real Models")
-                        hf_token_box = gr.Textbox(
-                            label="HuggingFace Token",
-                            placeholder="hf_...",
-                            type="password",
-                        )
-                        demo_cb = gr.Checkbox(label="Demo Mode", value=DEMO_MODE)
-                        btn_load = gr.Button(" Load / Reload Models", variant="primary")
-                        status_box = gr.Textbox(
-                            label="Status", lines=5, interactive=False,
-                            value="Running in demo mode."
-                        )
-                        btn_load.click(
-                            fn=lambda tok, dm: initialize_models(demo_mode=dm, hf_token=tok),
-                            inputs=[hf_token_box, demo_cb],
-                            outputs=status_box,
-                        )
-
-                    with gr.Column():
-                        gr.Markdown("""
-### Dataset
-- **MIMIC-CXR**: [PhysioNet](https://physionet.org/content/mimic-cxr/) / [Kaggle](https://www.kaggle.com/datasets/simhadrisadaram/mimic-cxr-dataset)
-- **MIMIC-CXR-VQA**: [GitHub](https://github.com/LightVED-prhlt/MIMIC-CXR-VQA-Dataset_Creation)
-
-### Build knowledge base
-```bash
-python scripts/build_knowledge_base.py \\
-    --reports_dir data/mimic_cxr/reports \\
-    --output_dir  data/knowledge_base \\
-    --backend clip
-```
-                        """)
 
         gr.HTML("""
         <div style="text-align:center;padding:12px;color:#9ca3af;font-size:0.85em;
@@ -446,7 +409,7 @@ python scripts/build_knowledge_base.py \\
     return demo
 
 
-#  Entry Point 
+#  Entry Point
 
 def main():
     parser = argparse.ArgumentParser()
